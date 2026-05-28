@@ -864,7 +864,7 @@
     </div>
     <div class="assumption-item">
       <strong>Backdated Refunds</strong>
-      3,597 records with <code>time_refund_processed = 2024-01-01 00:00:00</code> despite having <code>status = completed</code> — not refunded. This is a system default value, not a real refund date. These were not excluded from revenue but are noted as unreliable for timing analysis.
+      3,597 refunded orders have <code>time_refund_processed = 2024-01-01 00:00:00</code> — this appears to be a system default placeholder rather than the actual refund date. The refunds themselves are valid, but the timestamp is unreliable for any timing analysis.
     </div>
     <div class="assumption-item">
       <strong>Viewer-Buyer Join</strong>
