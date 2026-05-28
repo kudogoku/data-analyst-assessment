@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ONE FC Streaming Platform — Data Analysis Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --red: #E8002D;
+    --gold: #F5B800;
+    --dark: #0A0A0F;
+    --dark2: #131320;
+    --dark3: #1C1C2E;
+    --card: #1E1E30;
+    --border: #2A2A42;
+    --text: #E8E8F0;
+    --muted: #7070A0;
+    --green: #00D48B;
+    --orange: #FF6B35;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #0A0A0F 0%, #1a0a0f 50%, #0A0A0F 100%);
+    border-bottom: 2px solid var(--red);
+    padding: 60px 80px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: 'ONE FC';
+    position: absolute;
+    right: -20px;
+    top: -10px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 200px;
+    color: rgba(232,0,45,0.04);
+    letter-spacing: 10px;
+    pointer-events: none;
+  }
+  .header-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--red);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .header-tag::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 2px;
+    background: var(--red);
+  }
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    letter-spacing: 2px;
+    line-height: 1;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .header-sub {
+    font-size: 16px;
+    color: var(--muted);
+    font-weight: 300;
+    margin-bottom: 40px;
+  }
+  .header-meta {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .meta-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .meta-value {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+  }
+  /* LAYOUT */
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 80px;
+  }
+  section {
+    padding: 60px 80px;
+    border-bottom: 1px solid var(--border);
+  }
+  section:last-child { border-bottom: none; }
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  .section-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    color: var(--red);
+    letter-spacing: 2px;
+    opacity: 0.7;
+  }
+  h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 1px;
+    color: #fff;
+  }
+  /* KPI GRID */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .kpi-card:hover { border-color: var(--red); }
+  .kpi-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--accent, var(--red));
+  }
+  .kpi-label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .kpi-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    letter-spacing: 1px;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .kpi-sub {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .kpi-badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-top: 8px;
+  }
+  .badge-green { background: rgba(0,212,139,0.15); color: var(--green); }
+  .badge-red { background: rgba(232,0,45,0.15); color: var(--red); }
+  .badge-gold { background: rgba(245,184,0,0.15); color: var(--gold); }
+  /* CHARTS */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .chart-title {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+  .chart-full {
+    grid-column: 1 / -1;
+  }
+  canvas { max-height: 280px; }
+  /* TABLES */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: var(--dark2);
+  }
+  tbody tr {
+    border-bottom: 1px solid rgba(42,42,66,0.5);
+    transition: background 0.15s;
+  }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  tbody td {
+    padding: 12px 16px;
+    color: var(--text);
+  }
+  .td-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--gold);
+  }
+  .rank-bar {
+    display: inline-block;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--red);
+    vertical-align: middle;
+    margin-left: 8px;
+    opacity: 0.7;
+  }
+  /* FINDINGS */
+  .findings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .finding-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .finding-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+  .finding-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .finding-text {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .finding-card.warn { border-left: 3px solid var(--gold); }
+  .finding-card.ok { border-left: 3px solid var(--green); }
+  .finding-card.alert { border-left: 3px solid var(--red); }
+  /* ANOMALIES */
+  .anomaly-list { list-style: none; }
+  .anomaly-list li {
+    display: flex;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+  .anomaly-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .tag-high { background: rgba(232,0,45,0.2); color: var(--red); }
+  .tag-med { background: rgba(245,184,0,0.2); color: var(--gold); }
+  .tag-low { background: rgba(0,212,139,0.2); color: var(--green); }
+  .anomaly-text { font-size: 14px; color: var(--text); line-height: 1.6; }
+  .anomaly-detail { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  /* RECOMMENDATIONS */
+  .rec-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+  }
+  .rec-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .rec-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: rgba(232,0,45,0.15);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .rec-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  .rec-text { font-size: 13px; color: var(--muted); line-height: 1.7; }
+  /* ASSUMPTIONS */
+  .assumption-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .assumption-item {
+    background: var(--dark2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 13px;
+  }
+  .assumption-item strong {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 6px;
+  }
+  /* PROGRESS BAR */
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+  .progress-label { font-size: 13px; width: 200px; flex-shrink: 0; }
+  .progress-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: var(--dark3);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--red), var(--gold));
+    transition: width 1s ease;
+  }
+  .progress-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--gold);
+    width: 80px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  /* FOOTER */
+  .footer {
+    padding: 40px 80px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--dark2);
+  }
+  .footer-left { font-size: 12px; color: var(--muted); }
+  .footer-right {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-tag">Data Analyst Assessment</div>
+  <h1>ONE FC Streaming Platform<br>Data Analysis Report</h1>
+  <p class="header-sub">Analysis of user behavior, revenue performance, and platform health — Jan–May 2026</p>
+  <div class="header-meta">
+    <div class="meta-item">
+      <span class="meta-label">Dataset Period</span>
+      <span class="meta-value">Jan 29 – May 19, 2026</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Records Analyzed</span>
+      <span class="meta-value">1,203,041 rows total</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Tables</span>
+      <span class="meta-value">userdata · viewdata · purchase_data</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Analysis by</span>
+      <span class="meta-value">Data Assessment Submission</span>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 1: EXECUTIVE KPIs -->
+<section>
+  <div class="section-title">
+    <span class="section-num">01</span>
+    <h2>Executive Summary — Key Metrics</h2>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi-card" style="--accent: var(--gold)">
+      <div class="kpi-label">Total Revenue (USD)</div>
+      <div class="kpi-value">$678K</div>
+      <div class="kpi-sub">87,614 paid transactions</div>
+      <span class="kpi-badge badge-gold">Avg $7.74/order</span>
+    </div>
+    <div class="kpi-card" style="--accent: var(--green)">
+      <div class="kpi-label">Registered Users</div>
+      <div class="kpi-value">63,138</div>
+      <div class="kpi-sub">After deduplication</div>
+      <span class="kpi-badge badge-green">95.2% active</span>
+    </div>
+    <div class="kpi-card" style="--accent: var(--red)">
+      <div class="kpi-label">View Sessions</div>
+      <div class="kpi-value">1.05M</div>
+      <div class="kpi-sub">62,049 unique viewers</div>
+      <span class="kpi-badge badge-gold">17 avg sessions/user</span>
+    </div>
+    <div class="kpi-card" style="--accent: #7B61FF">
+      <div class="kpi-label">Viewer Conversion</div>
+      <div class="kpi-value">94.2%</div>
+      <div class="kpi-sub">Viewers who purchased</div>
+      <span class="kpi-badge badge-green">Extremely high</span>
+    </div>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Dominant Market</div>
+      <div class="kpi-value">TH</div>
+      <div class="kpi-sub">84.2% of view sessions</div>
+      <span class="kpi-badge badge-gold">Thailand</span>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Cancellation Rate</div>
+      <div class="kpi-value">2.0%</div>
+      <div class="kpi-sub">962 cancelled + 854 refunded</div>
+      <span class="kpi-badge badge-green">Very healthy</span>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Top Event Peak</div>
+      <div class="kpi-value">$5,235</div>
+      <div class="kpi-sub">Mar 20 — ONE Samurai 1 PPV</div>
+      <span class="kpi-badge badge-red">Single day spike</span>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Repeat Buyers</div>
+      <div class="kpi-value">29.6%</div>
+      <div class="kpi-sub">17,577 users w/ 2+ orders</div>
+      <span class="kpi-badge badge-gold">Retention signal</span>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 2: REVENUE -->
+<section>
+  <div class="section-title">
+    <span class="section-num">02</span>
+    <h2>Revenue Analysis</h2>
+  </div>
+  <div class="chart-grid">
+    <div class="chart-card chart-full">
+      <div class="chart-title">Daily Revenue (USD) — Jan–May 2026</div>
+      <canvas id="revenueChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Revenue by Product</div>
+      <canvas id="productChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Revenue by Payment Vendor</div>
+      <canvas id="vendorChart"></canvas>
+    </div>
+  </div>
+
+  <div style="margin-top: 28px;">
+    <div class="chart-card">
+      <div class="chart-title">Product Performance Breakdown</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Revenue (USD)</th>
+            <th>Orders</th>
+            <th>Avg Price</th>
+            <th>Unique Buyers</th>
+            <th>Revenue Share</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Ticket_ONEFC_MonthlyPass</td>
+            <td class="td-num">$429,274</td>
+            <td class="td-num">62,905</td>
+            <td class="td-num">$6.82</td>
+            <td class="td-num">44,617</td>
+            <td><span style="color:var(--green)">63.3%</span><span class="rank-bar" style="width:63px"></span></td>
+          </tr>
+          <tr>
+            <td>Subscription_One_Monthly</td>
+            <td class="td-num">$158,395</td>
+            <td class="td-num">18,467</td>
+            <td class="td-num">$8.58</td>
+            <td class="td-num">14,793</td>
+            <td><span style="color:var(--gold)">23.4%</span><span class="rank-bar" style="width:23px"></span></td>
+          </tr>
+          <tr>
+            <td>Ticket_OneFC_3MonthPass</td>
+            <td class="td-num">$90,590</td>
+            <td class="td-num">6,242</td>
+            <td class="td-num">$14.51</td>
+            <td class="td-num">5,549</td>
+            <td><span style="color:var(--muted)">13.4%</span><span class="rank-bar" style="width:13px"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div style="margin-top: 16px; padding: 16px 20px; background: var(--dark2); border-left: 3px solid var(--gold); border-radius: 6px; font-size: 13px; color: var(--muted);">
+    <strong style="color: var(--gold)">💡 Insight:</strong> The 3-Month Pass yields <strong style="color: var(--text)">2.1× higher revenue per order</strong> ($14.51 vs $6.82 for monthly) but accounts for only 7.1% of order volume. This product is under-promoted relative to its value potential.
+  </div>
+</section>
+
+<!-- SECTION 3: USER & GEO -->
+<section>
+  <div class="section-title">
+    <span class="section-num">03</span>
+    <h2>User Base &amp; Geographic Distribution</h2>
+  </div>
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Top Countries by View Sessions</div>
+      <div style="margin-top: 8px;">
+        <div class="progress-row">
+          <span class="progress-label">🇹🇭 Thailand (TH)</span>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:84.2%"></div></div>
+          <span class="progress-val">881,519</span>
+        </div>
+        <div class="progress-row">
+          <span class="progress-label">🇲🇾 Malaysia (MY)</span>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:3.5%"></div></div>
+          <span class="progress-val">36,545</span>
+        </div>
+        <div class="progress-row">
+          <span class="progress-label">🇺🇸 United States (US)</span>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:0.85%"></div></div>
+          <span class="progress-val">8,940</span>
+        </div>
+        <div class="progress-row">
+          <span class="progress-label">🇸🇬 Singapore (SG)</span>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:0.58%"></div></div>
+          <span class="progress-val">6,072</span>
+        </div>
+        <div class="progress-row">
+          <span class="progress-label">🇬🇧 United Kingdom (GB)</span>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:0.25%"></div></div>
+          <span class="progress-val">2,670</span>
+        </div>
+        <div class="progress-row">
+          <span class="progress-label">🇱🇦 Laos (LA)</span>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:0.24%"></div></div>
+          <span class="progress-val">2,528</span>
+        </div>
+        <div class="progress-row">
+          <span class="progress-label">🇦🇺 Australia (AU)</span>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:0.19%"></div></div>
+          <span class="progress-val">2,004</span>
+        </div>
+        <div class="progress-row">
+          <span class="progress-label">🇭🇰 Hong Kong (HK)</span>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:0.19%"></div></div>
+          <span class="progress-val">1,979</span>
+        </div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Revenue by Currency Region</div>
+      <canvas id="geoChart"></canvas>
+    </div>
+  </div>
+  <div style="margin-top: 16px; padding: 16px 20px; background: var(--dark2); border-left: 3px solid var(--red); border-radius: 6px; font-size: 13px; color: var(--muted);">
+    <strong style="color: var(--red)">⚠️ Concentration Risk:</strong> Thailand accounts for <strong style="color: var(--text)">84% of view sessions</strong> and <strong style="color: var(--text)">84% of revenue (THB-denominated orders)</strong>. Heavy dependence on one market creates vulnerability to local regulatory, economic, or competitive changes.
+  </div>
+</section>
+
+<!-- SECTION 4: ENGAGEMENT -->
+<section>
+  <div class="section-title">
+    <span class="section-num">04</span>
+    <h2>Event Viewership &amp; Engagement</h2>
+  </div>
+  <div class="chart-grid">
+    <div class="chart-card chart-full">
+      <div class="chart-title">Unique Viewers per Event</div>
+      <canvas id="eventChart"></canvas>
+    </div>
+  </div>
+
+  <div style="margin-top: 28px;">
+    <div class="chart-card">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Event</th>
+            <th>Sessions</th>
+            <th>Unique Viewers</th>
+            <th>Engagement Density</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-num">1</td>
+            <td>Superfan Fights — 20 Mar 2026</td>
+            <td class="td-num">151,932</td>
+            <td class="td-num" style="color:var(--green)">41,948</td>
+            <td>3.6 sessions/user</td>
+          </tr>
+          <tr>
+            <td class="td-num">2</td>
+            <td>ONE Samurai 1 PPV</td>
+            <td class="td-num">315,489</td>
+            <td class="td-num" style="color:var(--green)">32,245</td>
+            <td>9.8 sessions/user ⭐</td>
+          </tr>
+          <tr>
+            <td class="td-num">3</td>
+            <td>The Inner Circle — 15 May 2026</td>
+            <td class="td-num">82,396</td>
+            <td class="td-num">27,662</td>
+            <td>3.0 sessions/user</td>
+          </tr>
+          <tr>
+            <td class="td-num">4</td>
+            <td>The Inner Circle — 10 Apr 2026</td>
+            <td class="td-num">37,359</td>
+            <td class="td-num">15,283</td>
+            <td>2.4 sessions/user</td>
+          </tr>
+          <tr>
+            <td class="td-num">5</td>
+            <td>ONE Samurai 1 PPV (Replay)</td>
+            <td class="td-num">38,451</td>
+            <td class="td-num">13,442</td>
+            <td>2.9 sessions/user</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div style="margin-top: 16px; padding: 16px 20px; background: var(--dark2); border-left: 3px solid var(--green); border-radius: 6px; font-size: 13px; color: var(--muted);">
+    <strong style="color: var(--green)">📊 Note:</strong> ONE Samurai 1 PPV generated <strong style="color: var(--text)">9.8 sessions per unique viewer</strong> — the highest engagement density by far, suggesting users tuned in/out repeatedly or across multiple devices. This also correlates with the revenue spike on Mar 20 ($5,235 in a single day).
+  </div>
+</section>
+
+<!-- SECTION 5: RETENTION -->
+<section>
+  <div class="section-title">
+    <span class="section-num">05</span>
+    <h2>Retention &amp; Churn Indicators</h2>
+  </div>
+  <div class="findings-grid">
+    <div class="finding-card ok">
+      <div class="finding-icon">✅</div>
+      <div class="finding-title">Very Low Churn Signal</div>
+      <div class="finding-text">Only 2.0% of orders were cancelled or refunded (1,816 orders). This is well below typical subscription platform benchmarks of 5–10%, suggesting strong product-market fit and payment experience satisfaction.</div>
+    </div>
+    <div class="finding-card warn">
+      <div class="finding-icon">⚡</div>
+      <div class="finding-title">Repeat Purchase Cohort</div>
+      <div class="finding-text">29.6% of buyers made 2 or more purchases (17,577 users). The max purchases per user is 6, and the average across buyers is 1.36. Building loyalty programs for this high-value segment could drive disproportionate revenue uplift.</div>
+    </div>
+    <div class="finding-card alert">
+      <div class="finding-icon">⚠️</div>
+      <div class="finding-title">80% last_login Data Missing</div>
+      <div class="finding-text">52,294 out of 65,032 user records have no last_login value. This makes it impossible to calculate proper churn/DAU/MAU metrics. The platform should ensure login events are consistently logged to enable retention analysis.</div>
+    </div>
+    <div class="finding-card ok">
+      <div class="finding-icon">🔗</div>
+      <div class="finding-title">High Viewer-to-Buyer Conversion</div>
+      <div class="finding-text">94.2% of unique viewers also appear in the purchase database. This suggests the platform's free-to-view model (if any) is highly effective at converting, or that the product requires purchase to watch — either way, there is very little non-monetized viewership.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 6: DATA QUALITY -->
+<section>
+  <div class="section-title">
+    <span class="section-num">06</span>
+    <h2>Data Quality Issues &amp; Anomalies</h2>
+  </div>
+  <ul class="anomaly-list">
+    <li>
+      <span class="anomaly-tag tag-high">HIGH</span>
+      <div>
+        <div class="anomaly-text">Country codes in <code>userdata.csv</code> and <code>viewdata.csv</code> are inconsistent — "TH", "THA", "Thai", "Thailand" all represent the same country, inflating apparent diversity. After normalization, Thailand accounts for 84.2% of users (not the fragmented picture the raw data shows).</div>
+        <div class="anomaly-detail">Impact: Incorrect geographic segmentation. Fix: Standardize to ISO 3166-1 alpha-2 at ingestion.</div>
+      </div>
+    </li>
+    <li>
+      <span class="anomaly-tag tag-high">HIGH</span>
+      <div>
+        <div class="anomaly-text"><code>is_active</code> and <code>is_staff</code> columns mix boolean integers (0/1) with text strings ("Y", "yes", "N", "no"). 5 different representations exist for what should be a binary field.</div>
+        <div class="anomaly-detail">Impact: Any analysis using these fields raw will be wrong. Fix: Normalize to 0/1 boolean at source or ETL layer.</div>
+      </div>
+    </li>
+    <li>
+      <span class="anomaly-tag tag-high">HIGH</span>
+      <div>
+        <div class="anomaly-text"><code>signup_date</code>, <code>date_joined</code>, and <code>last_login</code> in userdata are heavily truncated — most values appear as "MM:SS.s" fragments (e.g., "36:53.9") rather than full timestamps. Only a small fraction have recognizable date formats (e.g., "6/11/2025"). This makes cohort analysis by signup month impossible.</div>
+        <div class="anomaly-detail">Impact: Cannot analyze user growth over time or tenure-based cohorts. Critical gap.</div>
+      </div>
+    </li>
+    <li>
+      <span class="anomaly-tag tag-med">MEDIUM</span>
+      <div>
+        <div class="anomaly-text">3,597 purchase records have <code>time_refund_processed</code> dates prior to 2026 (while all orders are from 2026). The most common backdated refund date appears to be 2024-01-01, suggesting a default/placeholder value rather than real refund timestamps.</div>
+        <div class="anomaly-detail">Impact: Refund timing analysis is unreliable. Fix: Treat refund dates before order date as null.</div>
+      </div>
+    </li>
+    <li>
+      <span class="anomaly-tag tag-med">MEDIUM</span>
+      <div>
+        <div class="anomaly-text">1,913 orders show <code>time_created</code> differing from <code>time_ordered</code> by more than 1 hour. Most notably, some records show <code>time_cancelled</code> before <code>time_ordered</code>, which is logically impossible.</div>
+        <div class="anomaly-detail">Impact: Order lifecycle timing is untrustworthy. Likely different timestamp timezone handling or processing delay.</div>
+      </div>
+    </li>
+    <li>
+      <span class="anomaly-tag tag-med">MEDIUM</span>
+      <div>
+        <div class="anomaly-text">7,164 purchase records (8.0%) have no <code>user_id</code>. These are legitimate paid transactions (mostly "fulfilled" status) but cannot be linked to specific users, preventing full lifetime-value analysis.</div>
+        <div class="anomaly-detail">Impact: LTV calculations are underestimated by ~8%. May relate to guest checkouts or deleted accounts.</div>
+      </div>
+    </li>
+    <li>
+      <span class="anomaly-tag tag-med">MEDIUM</span>
+      <div>
+        <div class="anomaly-text">1,894 duplicate <code>user_id</code> rows in userdata — same user appears more than once with different <code>id</code> values. This inflates the user count from 63,138 actual unique users to 65,032 rows.</div>
+        <div class="anomaly-detail">Fix: Deduplicate on user_id before any user-level aggregation. May indicate account merges or import errors.</div>
+      </div>
+    </li>
+    <li>
+      <span class="anomaly-tag tag-med">MEDIUM</span>
+      <div>
+        <div class="anomaly-text"><code>payment_vendor</code> has inconsistent casing: "stripe", "Stripe", "STRIPE" all appear, as do "paypal", "PayPal", "PAYPAL". After normalization: Stripe = 13,936 orders (not 692+669+668 separate entries).</div>
+        <div class="anomaly-detail">Fix: Normalize vendor names to title case at ETL layer.</div>
+      </div>
+    </li>
+    <li>
+      <span class="anomaly-tag tag-med">MEDIUM</span>
+      <div>
+        <div class="anomaly-text"><code>currency</code> column contains leading/trailing spaces (" THB", "THB ", etc.) creating 153 apparent unique currency codes when only ~20 real currencies exist.</div>
+        <div class="anomaly-detail">Fix: Apply .strip() and .upper() at ingestion. Standard data cleaning step that's being missed upstream.</div>
+      </div>
+    </li>
+    <li>
+      <span class="anomaly-tag tag-low">LOW</span>
+      <div>
+        <div class="anomaly-text"><code>leave_type</code> in viewdata uses mixed case ("Disconnect" vs "DISCONNECT") and synonyms ("timedout" vs "timeout") creating 7 values for what should be 5 distinct exit reasons.</div>
+        <div class="anomaly-detail">Fix: Normalize at event logging level. Minor but creates confusion in dropout analysis.</div>
+      </div>
+    </li>
+    <li>
+      <span class="anomaly-tag tag-low">LOW</span>
+      <div>
+        <div class="anomaly-text">19 "Comped" orders exist with $0 revenue and fulfilled status. These represent free/gifted subscriptions given to users. While small in number, they should be tracked separately for accurate revenue vs. access metrics.</div>
+        <div class="anomaly-detail">All 19 are 3-Month Pass products. May be influencer/partnership comps.</div>
+      </div>
+    </li>
+    <li>
+      <span class="anomaly-tag tag-low">LOW</span>
+      <div>
+        <div class="anomaly-text"><code>user_session_count</code> in viewdata shows a value of 1 for every single record (mean = 1.0, std = 0.0). This field appears to not be populated correctly — it likely should track how many times a user has watched, but is always 1.</div>
+        <div class="anomaly-detail">Field is effectively unusable in current state. Likely a logging defect.</div>
+      </div>
+    </li>
+  </ul>
+</section>
+
+<!-- SECTION 7: RECOMMENDATIONS -->
+<section>
+  <div class="section-title">
+    <span class="section-num">07</span>
+    <h2>Actionable Recommendations</h2>
+  </div>
+  <div class="rec-grid">
+    <div class="rec-card">
+      <div class="rec-num">01</div>
+      <div class="rec-title">Fix Upstream Data Quality</div>
+      <div class="rec-text">Standardize country codes (ISO 3166), boolean fields, vendor names, and currency values at the API/ingestion layer. Implement schema validation to catch these issues before they reach the analytics layer. Current data requires repeated manual cleaning on every analysis.</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-num">02</div>
+      <div class="rec-title">Promote the 3-Month Pass</div>
+      <div class="rec-text">The 3-Month Pass generates $14.51/order vs $6.82 for the monthly pass — 2.1× more revenue per transaction with fewer support touchpoints. At current order volumes, shifting 20% of monthly buyers to the 3-month plan would add ~$92K in incremental revenue.</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-num">03</div>
+      <div class="rec-title">Restore login_date Tracking</div>
+      <div class="rec-text">80% of users have no last_login data. Without this, it's impossible to calculate churn rate, DAU/MAU, or identify at-risk users. This is a critical gap — implement server-side login event logging immediately to enable retention analysis.</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-num">04</div>
+      <div class="rec-title">Geographic Diversification</div>
+      <div class="rec-text">84% revenue concentration in Thailand is a significant risk. Malaysia (3.4%) and international markets (Singapore, UK, Australia) show meaningful but underdeveloped presence. Consider localized content, pricing, or marketing campaigns targeting MY, SG, and diaspora markets.</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-num">05</div>
+      <div class="rec-title">Loyalty Program for Repeat Buyers</div>
+      <div class="rec-text">29.6% of buyers have purchased 2+ times. These high-LTV users should be segmented for targeted retention campaigns — early access, discounts, or exclusive content. Increasing their purchase frequency from 2 to 3 orders would meaningfully impact total revenue.</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-num">06</div>
+      <div class="rec-title">Investigate 8K Unlinked Purchases</div>
+      <div class="rec-text">7,164 fulfilled orders lack a user_id. These represent real revenue (~$55K estimated) from users who cannot be analyzed for engagement, retention, or LTV. Determine if these are guest checkouts, deleted accounts, or a data pipeline gap — and implement user linkage.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 8: ASSUMPTIONS -->
+<section>
+  <div class="section-title">
+    <span class="section-num">08</span>
+    <h2>Assumptions &amp; Methodology Notes</h2>
+  </div>
+  <div class="assumption-grid">
+    <div class="assumption-item">
+      <strong>Revenue Definition</strong>
+      Used <code>total_charges_usd</code> as the revenue metric (already in USD). Included only orders with status: fulfilled, Fulfilled, completed, COMPLETED, success, paid. Excluded refunded, cancelled, and disputed.
+    </div>
+    <div class="assumption-item">
+      <strong>Country Normalization</strong>
+      Mapped "thai", "Thailand", "THA" → "TH"; "USA" → "US"; "UK" → "GB". Applied to both userdata (country) and viewdata (geo_country). All codes converted to uppercase ISO 3166-1 alpha-2.
+    </div>
+    <div class="assumption-item">
+      <strong>Duplicate Users</strong>
+      1,894 duplicate user_id entries in userdata were removed (kept first occurrence). Assumed duplicate rows represent data import errors, not separate accounts. All user counts use deduplicated dataset.
+    </div>
+    <div class="assumption-item">
+      <strong>Boolean Normalization</strong>
+      is_active and is_staff: mapped "Y"/"yes"/1 → 1, "N"/"no"/0 → 0. Staff users (is_staff=1) were excluded from active user counts where noted to avoid inflating engagement metrics.
+    </div>
+    <div class="assumption-item">
+      <strong>Backdated Refunds</strong>
+      3,597 records with time_refund_processed year < 2026 were flagged as anomalous (likely placeholder "2024-01-01" default). These were not excluded from revenue but are noted as unreliable for timing analysis.
+    </div>
+    <div class="assumption-item">
+      <strong>Viewer-Buyer Join</strong>
+      Joined viewdata.kiswe_user_id with purchase_data.user_id as the user identifier. Assumed these are the same ID space. The 94.2% overlap supports this assumption, though a small residual may represent ID mismatches.
+    </div>
+    <div class="assumption-item">
+      <strong>Event Revenue Attribution</strong>
+      Revenue was not attributed to individual events because all purchases are for "ONE_PASS" (not event-specific tickets). Revenue spikes on event days reflect new subscriptions triggered by events, not per-event ticket sales.
+    </div>
+    <div class="assumption-item">
+      <strong>Signup Date</strong>
+      The majority of signup_date and date_joined values appear truncated to MM:SS.s format and were not usable for cohort analysis. A small subset with recognizable date formats was observed but not sufficient for trend analysis.
+    </div>
+  </div>
+</section>
+
+<div class="footer">
+  <div class="footer-left">ONE FC Streaming Platform — Data Analyst Assessment Submission</div>
+  <div class="footer-right">Generated: May 2026 · Charts: Chart.js · Data: 1.2M rows analyzed</div>
+</div>
+
+<script>
+const chartDefaults = {
+  color: '#7070A0',
+  plugins: {
+    legend: { labels: { color: '#7070A0', font: { family: 'DM Sans', size: 12 } } }
+  }
+};
+Chart.defaults.color = '#7070A0';
+Chart.defaults.borderColor = '#2A2A42';
+Chart.defaults.font.family = 'DM Sans';
+
+// REVENUE CHART
+new Chart(document.getElementById('revenueChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Jan 29','Feb 6','Feb 13','Feb 20','Feb 27','Mar 6','Mar 13','Mar 19','Mar 20','Mar 27','Apr 3','Apr 10','Apr 24','Apr 29','May 1','May 8','May 15','May 18'],
+    datasets: [{
+      label: 'Daily Revenue (USD)',
+      data: [15, 528, 309, 150, 425, 78, 234, 902, 5235, 115, 107, 159, 316, 236, 642, 842, 2983, 10],
+      backgroundColor: (ctx) => {
+        const v = ctx.raw;
+        if (v > 2000) return '#E8002D';
+        if (v > 500) return '#F5B800';
+        return 'rgba(232,0,45,0.4)';
+      },
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: '#7070A0', font: { size: 11 } } },
+      y: { ticks: { color: '#7070A0', callback: v => '$'+v.toLocaleString() } }
+    }
+  }
+});
+
+// PRODUCT CHART
+new Chart(document.getElementById('productChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Monthly Pass', 'One Monthly Subscription', '3-Month Pass'],
+    datasets: [{
+      data: [429274, 158395, 90590],
+      backgroundColor: ['#E8002D', '#F5B800', '#3D3D60'],
+      borderColor: '#1E1E30',
+      borderWidth: 3,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'bottom' } }
+  }
+});
+
+// VENDOR CHART
+new Chart(document.getElementById('vendorChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Omise', 'Xendit', 'Stripe', 'Antom', 'Paypal', 'Comped'],
+    datasets: [{
+      label: 'Revenue (USD)',
+      data: [341084, 146561, 131808, 53196, 5610, 0],
+      backgroundColor: ['#E8002D','#F5B800','#00D48B','#FF6B35','#7B61FF','#3D3D60'],
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: '#7070A0', callback: v => '$'+v.toLocaleString() } },
+      y: { ticks: { color: '#E8E8F0' } }
+    }
+  }
+});
+
+// GEO CHART
+new Chart(document.getElementById('geoChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Thailand (THB)', 'Malaysia (MYR)', 'US/Intl (USD)', 'Europe (EUR)', 'UK (GBP)', 'Singapore', 'Other'],
+    datasets: [{
+      data: [571964, 35209, 24679, 14689, 7346, 4253, 20118],
+      backgroundColor: ['#E8002D','#F5B800','#00D48B','#7B61FF','#FF6B35','#00B4D8','#3D3D60'],
+      borderColor: '#1E1E30',
+      borderWidth: 3,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } }
+  }
+});
+
+// EVENT CHART
+new Chart(document.getElementById('eventChart'), {
+  type: 'bar',
+  data: {
+    labels: [
+      'Superfan Fights\nMar 20',
+      'ONE Samurai\n1 PPV',
+      'Inner Circle\nMay 15',
+      'Inner Circle\nApr 10',
+      'Samurai Replay',
+      'Inner Circle\nMar 27',
+      'Inner Circle\nApr 3',
+      'Inner Circle\nMay 8',
+      'Inner Circle\nMay 1',
+      'ONE Lumpinee 144',
+    ],
+    datasets: [{
+      label: 'Unique Viewers',
+      data: [41948, 32245, 27662, 15283, 13442, 14066, 13558, 10868, 9508, 7881],
+      backgroundColor: (ctx) => {
+        const colors = ['#E8002D','#F5B800','#E8002D','rgba(232,0,45,0.5)','rgba(232,0,45,0.5)','rgba(232,0,45,0.4)','rgba(232,0,45,0.4)','rgba(232,0,45,0.35)','rgba(232,0,45,0.35)','rgba(232,0,45,0.3)'];
+        return colors[ctx.dataIndex] || 'rgba(232,0,45,0.3)';
+      },
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: '#7070A0', font: { size: 11 } } },
+      y: { ticks: { color: '#7070A0', callback: v => v.toLocaleString() } }
+    }
+  }
+});
+</script>
+</body>
+</html>
