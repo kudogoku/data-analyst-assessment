@@ -14,14 +14,14 @@
 ## How Claude Was Used
 
 ### 1. HTML report design
-I have a basic understanding of HTML but struggled to produce a clean, well-structured visual report on my own. I used Claude to help with the layout, styling, and Chart.js integration. The underlying data and numbers all came from my own Python analysis — Claude handled the presentation layer.
+I have a basic understanding of HTML but struggled to produce a clean, well-structured visual report on my own. I used Claude to help with the layout, styling, and Chart.js integration. The underlying data and numbers all came from my own Python analysis. Claude handled the presentation layer.
 
 ### 2. Interpreting ambiguous columns
 When I was unsure about a column's meaning or behavior, I used Claude as a sounding board. Two examples:
 
-**Revenue field selection** — The dataset had multiple charge-related columns. `charges_in_usd` contained structured data that would need additional parsing to extract usable numbers. Rather than spending time on that, I checked whether another column already had clean USD values and found `total_charges_usd`. I then asked Claude to confirm whether it was already inclusive of tax, given that the `tax` column sometimes showed values larger than the total. Claude confirmed the platform had already rolled everything into `total_charges_usd`, so I used that.
+**Revenue field selection** The dataset had multiple charge-related columns. `charges_in_usd` contained structured data that would need additional parsing to extract usable numbers. Rather than spending time on that, I checked whether another column already had clean USD values and found `total_charges_usd`. I then asked Claude to confirm whether it was already inclusive of tax, given that the `tax` column sometimes showed values larger than the total. Claude confirmed the platform had already rolled everything into `total_charges_usd`, so I used that.
 
-**geo_country vs country** — I asked Claude to explain the difference between these two fields. Understanding that `geo_country` is IP-detected at the time of viewing (while `country` is self-reported at signup) was important for framing the geographic analysis correctly.
+**geo_country vs country** I asked Claude to explain the difference between these two fields. Understanding that `geo_country` is IP-detected at the time of viewing (while `country` is self-reported at signup) was important for framing the geographic analysis correctly.
 
 ### 3. Debugging and error fixing
 When I ran into errors such as file path issues in Jupyter, git push failures due to large CSV files, and git history rewriting, I described what I was trying to do and asked for the right approach or command to use.
