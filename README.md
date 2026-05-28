@@ -21,7 +21,7 @@ This repository contains my submission for the Data Analyst Technical Assessment
 | File | Description |
 |------|-------------|
 | `ONE_FC_Analysis_Report.html` | Full interactive report with charts and findings |
-| `analysis.py` | Python script — data cleaning, EDA, and metrics |
+| `ONE_analysis.ipynb` | Jupyter Notebook — data cleaning, EDA, and metrics |
 | `README.md` | This file |
 | `AI_Tooling_Workflow_Notes.md` | Notes on AI tool usage during assessment |
 
@@ -50,7 +50,7 @@ This repository contains my submission for the Data Analyst Technical Assessment
 
 Open `ONE_FC_Analysis_Report.html` in any browser. No server or dependencies required.
 
-Or view via GitHub Pages at: `https://<your-username>.github.io/<repo-name>/ONE_FC_Analysis_Report.html`
+Or view via GitHub Pages at: https://kudogoku.github.io/data-analyst-assessment/ONE_FC_Analysis_Report.html
 
 ---
 
