@@ -402,13 +402,12 @@
 
 <!-- HEADER -->
 <div class="header">
-  <div class="header-tag">Data Analyst Assessment</div>
   <h1>ONE FC Streaming Platform<br>Data Analysis Report</h1>
   <p class="header-sub">Analysis of user behavior, revenue performance, and platform health — Jan–May 2026</p>
   <div class="header-meta">
     <div class="meta-item">
       <span class="meta-label">Dataset Period</span>
-      <span class="meta-value">Jan 29 – May 19, 2026</span>
+      <span class="meta-value">Jan – May 2026</span>
     </div>
     <div class="meta-item">
       <span class="meta-label">Records Analyzed</span>
@@ -420,7 +419,7 @@
     </div>
     <div class="meta-item">
       <span class="meta-label">Analysis by</span>
-      <span class="meta-value">Data Assessment Submission</span>
+      <span class="meta-value">Warinthip Arakkul</span>
     </div>
   </div>
 </div>
@@ -441,20 +440,20 @@
     <div class="kpi-card" style="--accent: var(--green)">
       <div class="kpi-label">Registered Users</div>
       <div class="kpi-value">63,138</div>
-      <div class="kpi-sub">After deduplication</div>
-      <span class="kpi-badge badge-green">95.2% active</span>
+      <div class="kpi-sub">62,049 have watched at least once</div>
+      <span class="kpi-badge badge-green">98.3% active viewers</span>
     </div>
     <div class="kpi-card" style="--accent: var(--red)">
       <div class="kpi-label">View Sessions</div>
       <div class="kpi-value">1.05M</div>
-      <div class="kpi-sub">62,049 unique viewers</div>
+      <div class="kpi-sub">Across all events Jan–May 2026</div>
       <span class="kpi-badge badge-gold">17 avg sessions/user</span>
     </div>
     <div class="kpi-card" style="--accent: #7B61FF">
-      <div class="kpi-label">Viewer Conversion</div>
-      <div class="kpi-value">94.2%</div>
-      <div class="kpi-sub">Viewers who purchased</div>
-      <span class="kpi-badge badge-green">Extremely high</span>
+      <div class="kpi-label">Active Viewers</div>
+      <div class="kpi-value">98.3%</div>
+      <div class="kpi-sub">62,049 of 63,138 users watched at least once</div>
+      <span class="kpi-badge badge-green">1,089 never watched</span>
     </div>
   </div>
   <div class="kpi-grid">
@@ -493,7 +492,7 @@
   </div>
   <div class="chart-grid">
     <div class="chart-card chart-full">
-      <div class="chart-title">Daily Revenue (USD) — Jan–May 2026</div>
+      <div class="chart-title">Monthly Revenue (USD) — Jan–May 2026</div>
       <canvas id="revenueChart"></canvas>
     </div>
     <div class="chart-card">
@@ -695,8 +694,8 @@
   <div class="findings-grid">
     <div class="finding-card ok">
       <div class="finding-icon">✅</div>
-      <div class="finding-title">Very Low Churn Signal</div>
-      <div class="finding-text">Only 2.0% of orders were cancelled or refunded (1,816 orders). This is well below typical subscription platform benchmarks of 5–10%, suggesting strong product-market fit and payment experience satisfaction.</div>
+      <div class="finding-title">Low Cancel &amp; Refund Rate</div>
+      <div class="finding-text">Only 2.0% of orders were cancelled or refunded (1,816 orders). This is a positive signal, but without reliable last_login data it is not possible to confirm whether overall churn is actually low — users may have stopped watching without cancelling.</div>
     </div>
     <div class="finding-card warn">
       <div class="finding-icon">⚡</div>
@@ -706,12 +705,7 @@
     <div class="finding-card alert">
       <div class="finding-icon">⚠️</div>
       <div class="finding-title">80% last_login Data Missing</div>
-      <div class="finding-text">52,294 out of 65,032 user records have no last_login value. This makes it impossible to calculate proper churn/DAU/MAU metrics. The platform should ensure login events are consistently logged to enable retention analysis.</div>
-    </div>
-    <div class="finding-card ok">
-      <div class="finding-icon">🔗</div>
-      <div class="finding-title">High Viewer-to-Buyer Conversion</div>
-      <div class="finding-text">94.2% of unique viewers also appear in the purchase database. This suggests the platform's free-to-view model (if any) is highly effective at converting, or that the product requires purchase to watch — either way, there is very little non-monetized viewership.</div>
+      <div class="finding-text">52,294 out of 63,138 user records have no last_login value. This makes it impossible to calculate proper churn rate, DAU/MAU, or identify at-risk users. Cancel &amp; refund rate is used as a proxy only — actual churn behaviour is unknown.</div>
     </div>
   </div>
 </section>
@@ -740,29 +734,29 @@
     <li>
       <span class="anomaly-tag tag-high">HIGH</span>
       <div>
-        <div class="anomaly-text"><code>signup_date</code>, <code>date_joined</code>, and <code>last_login</code> in userdata are heavily truncated — most values appear as "MM:SS.s" fragments (e.g., "36:53.9") rather than full timestamps. Only a small fraction have recognizable date formats (e.g., "6/11/2025"). This makes cohort analysis by signup month impossible.</div>
-        <div class="anomaly-detail">Impact: Cannot analyze user growth over time or tenure-based cohorts. Critical gap.</div>
+        <div class="anomaly-text"><code>signup_date</code> and <code>date_joined</code> in userdata contain mixed formats — "20/3/2026", "Mar 20 2026", "6/11/2025" are all present alongside MM:SS.s fragments. Additionally, 1,894 records have <code>signup_date = "1/1/2030"</code> which is a likely system placeholder. These users are confirmed real (98.3% have viewing activity) but their actual signup date is unknown.</div>
+        <div class="anomaly-detail">Impact: Cohort analysis by signup month is unreliable. Fix: Standardize date format at source and replace placeholder values.</div>
       </div>
     </li>
     <li>
       <span class="anomaly-tag tag-med">MEDIUM</span>
       <div>
-        <div class="anomaly-text">3,597 purchase records have <code>time_refund_processed</code> dates prior to 2026 (while all orders are from 2026). The most common backdated refund date appears to be 2024-01-01, suggesting a default/placeholder value rather than real refund timestamps.</div>
-        <div class="anomaly-detail">Impact: Refund timing analysis is unreliable. Fix: Treat refund dates before order date as null.</div>
+        <div class="anomaly-text">3,597 purchase records have <code>time_refund_processed = 2024-01-01 00:00:00</code> despite having <code>status = completed</code> — not refunded. This is a system default value, not a real refund date.</div>
+        <div class="anomaly-detail">Impact: Refund timing analysis is unreliable. These values should be treated as null.</div>
       </div>
     </li>
     <li>
       <span class="anomaly-tag tag-med">MEDIUM</span>
       <div>
-        <div class="anomaly-text">1,913 orders show <code>time_created</code> differing from <code>time_ordered</code> by more than 1 hour. Most notably, some records show <code>time_cancelled</code> before <code>time_ordered</code>, which is logically impossible.</div>
-        <div class="anomaly-detail">Impact: Order lifecycle timing is untrustworthy. Likely different timestamp timezone handling or processing delay.</div>
+        <div class="anomaly-text">1,913 orders show <code>time_created</code> differing from <code>time_ordered</code> by more than 1 hour. This is likely due to timezone differences between the user's device and the server, or order processing delays in the queue.</div>
+        <div class="anomaly-detail">Impact: Order lifecycle timing is unreliable for precise analysis. time_ordered is used as the reference timestamp throughout this report.</div>
       </div>
     </li>
     <li>
       <span class="anomaly-tag tag-med">MEDIUM</span>
       <div>
-        <div class="anomaly-text">7,164 purchase records (8.0%) have no <code>user_id</code>. These are legitimate paid transactions (mostly "fulfilled" status) but cannot be linked to specific users, preventing full lifetime-value analysis.</div>
-        <div class="anomaly-detail">Impact: LTV calculations are underestimated by ~8%. May relate to guest checkouts or deleted accounts.</div>
+        <div class="anomaly-text">7,164 purchase records (8.0%) have no <code>user_id</code>. These are legitimate paid transactions ($55,247 in revenue) but cannot be linked to specific users, preventing full lifetime-value analysis.</div>
+        <div class="anomaly-detail">Impact: LTV calculations are underestimated by ~8%. Cause is unknown — could be a data pipeline gap or deleted accounts.</div>
       </div>
     </li>
     <li>
@@ -829,7 +823,7 @@
     </div>
     <div class="rec-card">
       <div class="rec-num">03</div>
-      <div class="rec-title">Restore login_date Tracking</div>
+      <div class="rec-title">Restore last_login Tracking</div>
       <div class="rec-text">80% of users have no last_login data. Without this, it's impossible to calculate churn rate, DAU/MAU, or identify at-risk users. This is a critical gap — implement server-side login event logging immediately to enable retention analysis.</div>
     </div>
     <div class="rec-card">
@@ -845,7 +839,7 @@
     <div class="rec-card">
       <div class="rec-num">06</div>
       <div class="rec-title">Investigate 8K Unlinked Purchases</div>
-      <div class="rec-text">7,164 fulfilled orders lack a user_id. These represent real revenue (~$55K estimated) from users who cannot be analyzed for engagement, retention, or LTV. Determine if these are guest checkouts, deleted accounts, or a data pipeline gap — and implement user linkage.</div>
+      <div class="rec-text">7,164 fulfilled orders lack a user_id, representing $55,247 in revenue that cannot be attributed to any user. This prevents engagement, retention, or LTV analysis for these transactions. The cause is unknown — investigate whether this is a data pipeline gap and implement user linkage where possible.</div>
     </div>
   </div>
 </section>
@@ -859,7 +853,7 @@
   <div class="assumption-grid">
     <div class="assumption-item">
       <strong>Revenue Definition</strong>
-      Used <code>total_charges_usd</code> as the revenue metric (already in USD). Included only orders with status: fulfilled, Fulfilled, completed, COMPLETED, success, paid. Excluded refunded, cancelled, and disputed.
+      Used <code>total_charges_usd</code> as the revenue metric (already converted to USD by the platform). Included only orders with status: fulfilled or completed. Excluded refunded, cancelled, and disputed. Note: <code>tax</code> and <code>unit_price</code> columns are in local currency — not used in revenue calculations.
     </div>
     <div class="assumption-item">
       <strong>Country Normalization</strong>
@@ -879,7 +873,7 @@
     </div>
     <div class="assumption-item">
       <strong>Viewer-Buyer Join</strong>
-      Joined viewdata.kiswe_user_id with purchase_data.user_id as the user identifier. Assumed these are the same ID space. The 94.2% overlap supports this assumption, though a small residual may represent ID mismatches.
+      Joined <code>viewdata.kiswe_user_id</code> with <code>purchase_data.user_id</code> as the user identifier. Assumed these are the same ID space based on the high overlap observed between the two tables.
     </div>
     <div class="assumption-item">
       <strong>Event Revenue Attribution</strong>
@@ -887,7 +881,7 @@
     </div>
     <div class="assumption-item">
       <strong>Signup Date</strong>
-      The majority of signup_date and date_joined values appear truncated to MM:SS.s format and were not usable for cohort analysis. A small subset with recognizable date formats was observed but not sufficient for trend analysis.
+      <code>signup_date</code> contains mixed formats ("20/3/2026", "Mar 20 2026", MM:SS.s fragments) making consistent parsing unreliable. 1,894 records with <code>signup_date = "1/1/2030"</code> are treated as valid users with unknown signup dates — confirmed by their viewing and purchase activity.
     </div>
   </div>
 </section>
@@ -908,28 +902,38 @@ Chart.defaults.color = '#7070A0';
 Chart.defaults.borderColor = '#2A2A42';
 Chart.defaults.font.family = 'DM Sans';
 
-// REVENUE CHART
+// REVENUE CHART — Monthly
 new Chart(document.getElementById('revenueChart'), {
   type: 'bar',
   data: {
-    labels: ['Jan 29','Feb 6','Feb 13','Feb 20','Feb 27','Mar 6','Mar 13','Mar 19','Mar 20','Mar 27','Apr 3','Apr 10','Apr 24','Apr 29','May 1','May 8','May 15','May 18'],
+    labels: ['Jan 2026', 'Feb 2026', 'Mar 2026', 'Apr 2026', 'May 2026'],
     datasets: [{
-      label: 'Daily Revenue (USD)',
-      data: [15, 528, 309, 150, 425, 78, 234, 902, 5235, 115, 107, 159, 316, 236, 642, 842, 2983, 10],
+      label: 'Monthly Revenue (USD)',
+      data: [15.33, 1594.69, 7561.07, 1141.47, 5334.05],
       backgroundColor: (ctx) => {
         const v = ctx.raw;
-        if (v > 2000) return '#E8002D';
-        if (v > 500) return '#F5B800';
-        return 'rgba(232,0,45,0.4)';
+        if (v > 5000) return '#E8002D';
+        if (v > 1000) return '#F5B800';
+        return '#3B82F6';
       },
-      borderRadius: 4,
+      borderRadius: 6,
     }]
   },
   options: {
     responsive: true,
-    plugins: { legend: { display: false } },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          afterLabel: (ctx) => {
+            const peaks = ['Jan 29: $15', 'Feb 6: $528', 'Mar 20: $5,235 (ONE Samurai 1 PPV)', 'Apr 24: $316', 'May 15: $2,983 (The Inner Circle)'];
+            return 'Peak day → ' + peaks[ctx.dataIndex];
+          }
+        }
+      }
+    },
     scales: {
-      x: { ticks: { color: '#7070A0', font: { size: 11 } } },
+      x: { ticks: { color: '#7070A0', font: { size: 12 } } },
       y: { ticks: { color: '#7070A0', callback: v => '$'+v.toLocaleString() } }
     }
   }
@@ -1014,8 +1018,8 @@ new Chart(document.getElementById('eventChart'), {
       label: 'Unique Viewers',
       data: [41948, 32245, 27662, 15283, 13442, 14066, 13558, 10868, 9508, 7881],
       backgroundColor: (ctx) => {
-        const colors = ['#E8002D','#F5B800','#E8002D','rgba(232,0,45,0.5)','rgba(232,0,45,0.5)','rgba(232,0,45,0.4)','rgba(232,0,45,0.4)','rgba(232,0,45,0.35)','rgba(232,0,45,0.35)','rgba(232,0,45,0.3)'];
-        return colors[ctx.dataIndex] || 'rgba(232,0,45,0.3)';
+        const colors = ['#E8002D','#F5B800','#E8002D','#3B82F6','#3B82F6','#3B82F6','#3B82F6','#3B82F6','#3B82F6','#3B82F6'];
+        return colors[ctx.dataIndex] || '#3B82F6';
       },
       borderRadius: 6,
     }]
