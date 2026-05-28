@@ -4,64 +4,28 @@
 
 | Tool | Purpose |
 |------|---------|
-| **Claude (Anthropic)** | Primary AI assistant throughout the assessment |
-| **Python / pandas** | Data loading, cleaning, and analysis |
+| **Claude (Anthropic)** | AI assistant used during the assessment |
+| **Python / pandas / numpy** | Data loading, cleaning, and analysis |
+| **Matplotlib** | Data visualizations in the Jupyter Notebook |
 | **Chart.js** | Interactive visualizations in the HTML report |
-| **Google** | Reference for ISO 3166 country codes, Chart.js docs |
 
 ---
 
 ## How Claude Was Used
 
-### 1. Archive Extraction
-The data was provided as a `.7z` file. When standard tools weren't available in the environment, I used Claude to write a Python script using `ctypes` to call the system's `libarchive.so` directly — extracting all three CSVs without needing to install anything.
+### 1. HTML Report Design
+I have a basic understanding of HTML but struggled to produce a clean, well-structured visual report on my own. I used Claude to help with the layout, styling, and Chart.js integration. The underlying data and numbers all came from my own Python analysis — Claude handled the presentation layer.
 
-> **Prompt used:** *"7z isn't installed, but libarchive.so.13 is available. Write Python using ctypes to list and extract files from a .7z archive."*
+### 2. Debugging & Error Fixing
+When I hit errors during the analysis or while setting up the GitHub repository, I used Claude as a support resource — describing what I was trying to do and asking for the right approach or code to use, rather than searching through documentation alone.
 
-I validated the output by checking file sizes matched the archive manifest before proceeding.
-
----
-
-### 2. Data Exploration & Cleaning Strategy
-After loading the datasets, I used Claude to help identify systematic issues across all three files simultaneously rather than discovering them one at a time.
-
-> **Workflow:** Run pandas `.describe()`, `.value_counts()`, and `.isnull().sum()` → paste output to Claude → discuss what anomalies are worth fixing vs. flagging.
-
-**Example where I modified Claude's suggestion:** Claude initially suggested dropping all rows with truncated `signup_date` values. I instead decided to flag the issue and work around it, since removing those rows would have eliminated ~90% of the user dataset — not appropriate given the task was analysis, not cleansing-for-ML.
-
----
-
-### 3. Revenue Analysis Logic
-Claude helped draft the SQL-equivalent logic for grouping revenue by product, vendor, and month in pandas. I reviewed and adjusted the paid status filter — Claude initially included only `'fulfilled'` but I expanded it to also include `'completed'`, `'success'`, and `'paid'` after checking that these all represent genuine successful transactions.
-
-**Rejected suggestion:** Claude proposed using `charges_in_usd` as the revenue field. I rejected this because that column contains a large embedded JSON blob, not a simple numeric value. `total_charges_usd` is the correct pre-calculated field.
-
----
-
-### 4. Report Design
-Claude generated the HTML report with embedded Chart.js visualizations. I reviewed all chart data points against the raw analysis output to confirm accuracy before including them. The daily revenue chart, product doughnut, and event bar chart were all manually verified against the pandas groupby outputs.
-
----
-
-### 5. Data Quality Categorization
-I used Claude to help organize and prioritize the anomalies into HIGH / MEDIUM / LOW severity categories. The categorization logic was mine — HIGH = breaks analysis results, MEDIUM = distorts metrics, LOW = cosmetic/minor.
-
----
-
-## What I Validated or Rejected
-
-| AI Suggestion | Action | Reason |
-|---------------|--------|--------|
-| Use `charges_in_usd` for revenue | ❌ Rejected | Column contains JSON, not a number |
-| Drop rows with truncated signup dates | ❌ Modified | Would remove 90% of data — flag instead |
-| Include only `fulfilled` status as paid | ✏️ Modified | `completed`, `success`, `paid` also represent real transactions |
-| Normalize country to 3-letter codes | ✏️ Modified | Used 2-letter ISO alpha-2 instead — more standard |
-| Mark all 3,597 backdated refunds as errors | ✅ Accepted | Refund date before order date is logically impossible |
+### 3. Understanding the Data
+This was my first time working with streaming platform data. I used Claude as a sounding board to help interpret what certain columns meant in context — for example, understanding the difference between `geo_country` (IP-based location at time of viewing) vs `country` (self-reported at signup), and why sessions could be much higher than unique users.
 
 ---
 
 ## Reflection
 
-Using Claude significantly accelerated the extraction and cleaning phases. The value wasn't in having it generate final answers — it was in quickly generating code to explore data I'd never seen before, which I then read, verified, and adjusted. Every number in the report was cross-checked against the raw pandas output.
+Using Claude helped me work through unfamiliar parts of the assessment faster — particularly around report design and debugging. That said, the analytical decisions were my own: which metrics to calculate, how to interpret the data, what anomalies were worth flagging, and what the business implications actually were.
 
-The assessment brief is right that "using AI to generate code without understanding it will likely become evident during review." The places where I pushed back or modified suggestions — particularly around the revenue field and status normalization — are where actual business understanding matters, and no AI tool can substitute for reading the data carefully.
+There were also moments where I caught Claude producing incorrect outputs and corrected them myself — which reinforced that AI tools are only useful when you're actively thinking alongside them, not just accepting what they produce.
