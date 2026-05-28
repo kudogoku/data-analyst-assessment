@@ -864,7 +864,7 @@
     </div>
     <div class="assumption-item">
       <strong>Backdated Refunds</strong>
-      3,597 records with time_refund_processed year < 2026 were flagged as anomalous (likely placeholder "2024-01-01" default). These were not excluded from revenue but are noted as unreliable for timing analysis.
+      3,597 records with <code>time_refund_processed = 2024-01-01 00:00:00</code> despite having <code>status = completed</code> — not refunded. This is a system default value, not a real refund date. These were not excluded from revenue but are noted as unreliable for timing analysis.
     </div>
     <div class="assumption-item">
       <strong>Viewer-Buyer Join</strong>
@@ -876,7 +876,7 @@
     </div>
     <div class="assumption-item">
       <strong>Signup Date</strong>
-      <code>signup_date</code> contains mixed formats ("20/3/2026", "Mar 20 2026", MM:SS.s fragments) making consistent parsing unreliable. 1,894 records with <code>signup_date = "1/1/2030"</code> are treated as valid users with unknown signup dates — confirmed by their viewing and purchase activity.
+      <code>signup_date</code> contains mixed formats ("20/3/2026", "Mar 20 2026", MM:SS.s fragments) making consistent parsing unreliable. 1,941 records with <code>signup_date = "1/1/2030"</code> are treated as valid users with unknown signup dates — confirmed by their viewing and purchase activity.
     </div>
   </div>
 </section>
